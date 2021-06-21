@@ -81,10 +81,10 @@ class HDDeployableBarricade : HDPickup
 				double sinp = sin(pitch);
 				double cosp = cos(pitch);
 
-				double XVel = 1 + (2 * (CheckInventory("PowerStrength", 0) ? 3 : 1)) * cosp;
-				double ZVel = 1 + (2 * (CheckInventory("PowerStrength", 0) ? 2 : 1)) * -sinp;
+				double XVel = 1 + (CheckInventory("PowerStrength", 0) ? 3 : 1) * cosp;
+				double ZVel = 1 + (CheckInventory("PowerStrength", 0) ? 2 : 1) * -sinp;
 
-				[success, a] = A_SpawnItemEx("HDDeployedBarricade", 10, 0, height / 2 + 8, XVel, 0, ZVel, flags: SXF_NOCHECKPOSITION | SXF_SETMASTER | SXF_TRANSFERTRANSLATION);
+				[success, a] = A_SpawnItemEx("HDDeployedBarricade", 5, 0, height / 2 + 8, XVel, 0, ZVel, flags: SXF_NOCHECKPOSITION | SXF_SETMASTER | SXF_TRANSFERTRANSLATION);
 				let depBarricade = HDDeployedBarricade(a);
 				depBarricade.Health = invoker.Health;
 				depBarricade.angle += 180;
@@ -103,6 +103,7 @@ class HDDeployedBarricade : HDActor
 		{
 			TimesUsed--;
 		}
+		vel.xy *= 0.94;
 	}
 
 	override bool Used(Actor user)
@@ -160,6 +161,7 @@ class HDDeployedBarricade : HDActor
 		Friction 0.95;
 		Renderstyle "Normal";
 		DamageFactor "Hot", 0.15;
+		Gravity 1.5;
 		+SOLID
 	}
 
