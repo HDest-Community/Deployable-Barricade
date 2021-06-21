@@ -85,6 +85,7 @@ class HDDeployedBarricade : Actor
 			return false;
 		}
 		
+		A_StartSound("doors/dr1_clos", pitch: 1.1);
 		SetStateLabel('UnDeploy');
 		return true;
 	}
@@ -124,6 +125,7 @@ class HDDeployedBarricade : Actor
 				{
 					A_Stop();
 					SetStateLabel('Deploy');
+					A_StartSound("doors/dr1_open", pitch: 1.1);
 					bSOLID = false;
 					for (double i = -Radius; i <= Radius; i += 6)
 					{
@@ -139,7 +141,7 @@ class HDDeployedBarricade : Actor
 			}
 			Loop;
 		Deploy:
-			DPBR A 8;
+			DPBR A 3;
 			DPBR ABCDE 2
 			{
 				for (int i = 0; i < CenterSegments.Size(); ++i)
@@ -148,7 +150,7 @@ class HDDeployedBarricade : Actor
 				}
 				A_SetSize(-1, Height + 4);
 			}
-			DPBR E 8;
+			DPBR E 3;
 			DPBR FGHIJ 2
 			{
 				Actor a; bool success; BarricadeBarricade br;
@@ -165,7 +167,7 @@ class HDDeployedBarricade : Actor
 
 					Offset += 6;
 			}
-			DPBR J 8;
+			DPBR J 3;
 			DPBR KLMNO 2
 			{
 				for (int i = 0; i < LeftSideSegments.Size(); ++i)
