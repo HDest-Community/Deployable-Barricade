@@ -136,14 +136,13 @@ class HDDeployedBarricade : HDActor
 	{
 		if (Health > 0)
 		{
-			Health -= damage;
+			Health -= ApplyDamageFactor('Hot', damage);
 			if (Health <= 0)
 			{
 				SetStateLabel('Boom');
 			}
 		}
-
-		return Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+		return 0;
 	}
 
 	bool Deployed;
@@ -160,6 +159,7 @@ class HDDeployedBarricade : HDActor
 		Mass 20000;
 		Friction 0.95;
 		Renderstyle "Normal";
+		DamageFactor "Hot", 0.15;
 		+SOLID
 	}
 
@@ -351,8 +351,7 @@ class BarricadeBarricade : HDActor
 	override int DamageMobj(Actor inflictor, Actor source, int damage, Name mod, int flags, double angle)
 	{
 		master.DamageMobj(inflictor, source, damage, mod, flags, angle);
-
-		return Super.DamageMobj(inflictor, source, damage, mod, flags, angle);
+		return 0;
 	}
 
 	override double BulletResistance(double hitangle)
