@@ -6,3 +6,4 @@
 ### Notes
 ---
 - The loadout code for the barricade is `dab`.
+- The barricade has 5000 health. Mind the damage.
