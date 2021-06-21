@@ -136,7 +136,7 @@ class HDDeployedBarricade : HDActor
 	{
 		if (Health > 0)
 		{
-			Health -= ApplyDamageFactor('Hot', damage);
+			Health -= ApplyDamageFactor(mod, damage);
 			if (Health <= 0)
 			{
 				SetStateLabel('Boom');
