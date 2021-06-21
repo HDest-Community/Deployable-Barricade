@@ -1,0 +1,310 @@
+version "4.0"
+
+class BarricadeHandler : EventHandler
+{
+	override void CheckReplacement(ReplaceEvent e)
+	{
+		if (!e.Replacement)
+		{
+			return;
+		}
+
+		switch (e.Replacement.GetClassName())
+		{
+			case 'Lumberjack':
+				if (random[redrand]() <= 32)
+				{
+					e.Replacement = "HDDeployableBarricade";
+				}
+				break;
+		}
+	}
+}
+
+class HDDeployableBarricade : HDPickup
+{
+	Default
+	{
+		+HDPICKUP.CHEATNOGIVE
+		+HDPICKUP.NOTINPOCKETS
+		+INVENTORY.INVBAR
+		-HDPICKUP.FITSINBACKPACK
+		HDPickup.Bulk 250;
+		HDPickup.RefID "dab";
+		Inventory.MaxAmount 1;
+		Inventory.Icon "DABRB0";
+		Inventory.PickupMessage "Picked up a deployable barricade.";
+		Tag "Deployable barricade";
+	}
+
+	States
+	{
+		Spawn:
+			DABR A -1;
+			Stop;
+		Use:
+			TNT1 A 0
+			{
+				bool success; Actor a;
+
+				double sinp = sin(pitch);
+				double cosp = cos(pitch);
+
+				double XVel = 1 + (2 * (CheckInventory("PowerStrength", 0) ? 3 : 1)) * cosp;
+				double ZVel = 1 + (2 * (CheckInventory("PowerStrength", 0) ? 2 : 1)) * -sinp;
+
+				[success, a] = A_SpawnItemEx("HDDeployedBarricade", 10, 0, height / 2 + 8, XVel, 0, ZVel, flags: SXF_NOCHECKPOSITION | SXF_SETMASTER | SXF_TRANSFERTRANSLATION);
+				let depBarricade = HDDeployedBarricade(a);
+				depBarricade.angle += 180;
+				depBarricade.vel += vel;
+			}
+			Stop;
+	}
+}
+
+class HDDeployedBarricade : Actor
+{
+	override void Tick()
+	{
+		Super.Tick();
+		if (GetAge() % 10 == 0 && TimesUsed > 0)
+		{
+			TimesUsed--;
+		}
+	}
+
+	override bool Used(Actor user)
+	{
+		if (!Deployed)
+		{
+			return false;
+		}
+		else if (TimesUsed < 4)
+		{
+			TimesUsed++;
+			return false;
+		}
+		
+		SetStateLabel('UnDeploy');
+		return true;
+	}
+
+	override bool CanCollideWith(Actor other, bool passive)
+	{
+		if (other == master)
+		{
+			return false;
+		}
+
+		return Super.CanCollideWith(other, passive);
+	}
+
+	bool Deployed;
+	int TimesUsed;
+	Array<BarricadeBarricade> CenterSegments;
+	Array<BarricadeBarricade> LeftSideSegments;
+	Array<BarricadeBarricade> RightSideSegments;
+	private int Offset;
+
+	Default
+	{
+		Radius 28;
+		Height 20;
+		Mass 20000;
+		Friction 0.95;
+		+SOLID
+	}
+
+	States
+	{
+		Spawn:
+			DPBR A 1
+			{
+				if (vel.length() < 0.4)
+				{
+					A_Stop();
+					SetStateLabel('Deploy');
+					bSOLID = false;
+					for (double i = -Radius; i <= Radius; i += 6)
+					{
+						Actor a; bool success;
+						[success, a] = A_SpawnItemEx("BarricadeBarricade", 0, i, flags: SXF_SETMASTER);
+						let br = BarricadeBarricade(a);
+						br.A_SetSize(-1, Height);
+						br.Core = true;
+						CenterSegments.Push(br);
+					}
+					return;
+				}
+			}
+			Loop;
+		Deploy:
+			DPBR A 8;
+			DPBR ABCDE 2
+			{
+				for (int i = 0; i < CenterSegments.Size(); ++i)
+				{
+					CenterSegments[i].A_SetSize(-1, CenterSegments[i].Height + 4);
+				}
+				A_SetSize(-1, Height + 4);
+			}
+			DPBR E 8;
+			DPBR FGHIJ 2
+			{
+				Actor a; bool success; BarricadeBarricade br;
+
+					[success, a] = A_SpawnItemEx("BarricadeBarricade", 0, (Radius + 6 + Offset), 0, flags: SXF_SETMASTER);
+					br = BarricadeBarricade(a);
+					br.A_SetSize(-1, Height);
+					LeftSideSegments.Push(br);
+
+					[success, a] = A_SpawnItemEx("BarricadeBarricade", 0, -(Radius + 6 + Offset), 0, flags: SXF_SETMASTER);
+					br = BarricadeBarricade(a);
+					br.A_SetSize(-1, Height);
+					RightSideSegments.Push(br);
+
+					Offset += 6;
+			}
+			DPBR J 8;
+			DPBR KLMNO 2
+			{
+				for (int i = 0; i < LeftSideSegments.Size(); ++i)
+				{
+					LeftSideSegments[i].A_SetSize(-1, LeftSideSegments[i].Height + 3.5);
+				}
+				for (int i = 0; i < RightSideSegments.Size(); ++i)
+				{
+					RightSideSegments[i].A_SetSize(-1, RightSideSegments[i].Height + 3.5);
+				}
+			}
+		Idle:
+			DPBR # -1
+			{
+				Deployed = true;
+			}
+			Stop;
+
+		UnDeploy:
+			DPBR ONMLK 2
+			{
+				Deployed = false;
+				for (int i = 0; i < LeftSideSegments.Size(); ++i)
+				{
+					LeftSideSegments[i].A_SetSize(-1, LeftSideSegments[i].Height - 3.5);
+				}
+				for (int i = 0; i < RightSideSegments.Size(); ++i)
+				{
+					RightSideSegments[i].A_SetSize(-1, RightSideSegments[i].Height - 3.5);
+				}
+			}
+			DPBR K 2;
+			DPBR JIHGF 2
+			{
+				for (int i = 0; i < 2; ++i)
+				{
+					int lsize = LeftSideSegments.Size();
+					if (lsize > 0)
+					{
+						LeftSideSegments[lsize - 1].Destroy();
+						LeftSideSegments.Pop();
+					}
+					int rsize = RightSideSegments.Size();
+					if (rsize > 0)
+					{
+						RightSideSegments[rsize - 1].Destroy();
+						RightSideSegments.Pop();
+					}
+				}
+			}
+			DPBR EDCBA 2
+			{
+				for (int i = 0; i < CenterSegments.Size(); ++i)
+				{
+					CenterSegments[i].A_SetSize(-1, CenterSegments[i].Height - 4);
+				}
+				A_SetSize(-1, Height - 4);
+			}
+			DPBR A 0 A_SpawnItemEx("HDDeployableBarricade");
+			Stop;
+	}
+}
+
+// [Ace] No, this isn't a typo.
+class BarricadeBarricade : HDActor
+{
+	override void Tick()
+	{
+		let br = HDDeployedBarricade(master);
+		if (!br)
+		{
+			Destroy();
+			return;
+		}
+
+		// [Ace] Nuke the thing if it gets automatically moved by the engine.
+		if (abs(pos.z - br.pos.z) > 1)
+		{
+			if (Core && br.Deployed)
+			{
+				br.Deployed = false;
+				br.SetStateLabel('UnDeploy');
+				return;
+			}
+
+			int leftIndex = br.LeftSideSegments.Find(self);
+			if (leftIndex != br.LeftSideSegments.Size())
+			{
+				br.LeftSideSegments.Delete(leftIndex);
+				Destroy();
+				return;
+			}
+
+			int rightIndex = br.RightSideSegments.Find(self);
+			if (rightIndex != br.RightSideSegments.Size())
+			{
+				br.RightSideSegments.Delete(rightIndex);
+				Destroy();
+				return;
+			}
+		}
+
+		Super.Tick();
+	}
+
+	override double BulletResistance(double hitangle)
+	{
+		return Super.BulletResistance(hitangle) * 35;
+	}
+
+	override bool Used(Actor user)
+	{
+		master.Used(user);
+		return true;
+	}
+
+	bool Core;
+
+	Default
+	{
+		Radius 3.5;
+		Height 10;
+		Mass 10000;
+		+NOGRAVITY
+		+SOLID
+		+SHOOTABLE
+		+NODAMAGE
+		+NOBLOOD
+		+FORCEYBILLBOARD
+		+DONTTHRUST
+		+WALLSPRITE
+		+NOFRICTIONBOUNCE
+		+NOLIFTDROP
+	}
+
+	States
+	{
+		Spawn:
+			TNT1 A -1;
+			STop;
+	}
+}
