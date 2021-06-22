@@ -84,7 +84,7 @@ class HDDeployableBarricade : HDPickup
 				double XVel = 1 + (CheckInventory("PowerStrength", 0) ? 3 : 1) * cosp;
 				double ZVel = 1 + (CheckInventory("PowerStrength", 0) ? 2 : 1) * -sinp;
 
-				[success, a] = A_SpawnItemEx("HDDeployedBarricade", 5, 0, height / 2 + 8, XVel, 0, ZVel, flags: SXF_NOCHECKPOSITION | SXF_SETMASTER | SXF_TRANSFERTRANSLATION);
+				[success, a] = A_SpawnItemEx("HDDeployedBarricade", radius + 4, 0, height / 2 + 8, XVel, 0, ZVel, flags: SXF_NOCHECKPOSITION | SXF_SETMASTER | SXF_TRANSFERTRANSLATION);
 				let depBarricade = HDDeployedBarricade(a);
 				depBarricade.Health = invoker.Health;
 				depBarricade.angle += 180;
@@ -103,7 +103,6 @@ class HDDeployedBarricade : HDActor
 		{
 			TimesUsed--;
 		}
-		vel.xy *= 0.94;
 		// if (!IsFrozen())
 		// {
 		// 	AceCore.DrawCollisionBox(self, 0xFF0000, 1, 1);
@@ -166,6 +165,7 @@ class HDDeployedBarricade : HDActor
 		Renderstyle "Normal";
 		DamageFactor "Hot", 0.15;
 		Gravity 1.5;
+		Friction 0.5;
 		+SOLID
 	}
 
