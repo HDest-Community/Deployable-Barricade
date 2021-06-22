@@ -11,8 +11,8 @@ class BarricadeHandler : EventHandler
 
 		switch (e.Replacement.GetClassName())
 		{
-			case 'Lumberjack':
-				if (random[redrand]() <= 48)
+			case 'RLReplaces':
+				if (random[redrand]() <= 24)
 				{
 					e.Replacement = "HDDeployableBarricade";
 				}
