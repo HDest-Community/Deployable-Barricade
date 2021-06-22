@@ -104,11 +104,15 @@ class HDDeployedBarricade : HDActor
 			TimesUsed--;
 		}
 		vel.xy *= 0.94;
+		// if (!IsFrozen())
+		// {
+		// 	AceCore.DrawCollisionBox(self, 0xFF0000, 1, 1);
+		// }
 	}
 
 	override bool Used(Actor user)
 	{
-		if (!Deployed)
+		if (!Deployed || Distance3D(user) > 50)
 		{
 			return false;
 		}
@@ -155,7 +159,7 @@ class HDDeployedBarricade : HDActor
 
 	Default
 	{
-		Radius 28;
+		Radius 30;
 		Height 20;
 		Mass 20000;
 		Friction 0.95;
