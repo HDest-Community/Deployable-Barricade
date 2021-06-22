@@ -332,7 +332,7 @@ class BarricadeBarricade : HDActor
 		}
 
 		// [Ace] Nuke the thing if it gets automatically moved by the engine.
-		if (floorz > br.floorz)
+		if (floorz - 8 > br.floorz)
 		{
 			if (Core && br.Deployed)
 			{
