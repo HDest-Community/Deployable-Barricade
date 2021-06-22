@@ -164,6 +164,10 @@ class HDDeployedBarricade : HDActor
 		Friction 0.95;
 		Renderstyle "Normal";
 		DamageFactor "Hot", 0.15;
+		DamageFactor "Balefire", 0.05;
+		DamageFactor "Burning", 0.15;
+		DamageFactor "Electrical", 0.05;
+		DamageFactor "Holy", 0;
 		Gravity 1.5;
 		Friction 0.5;
 		+SOLID
