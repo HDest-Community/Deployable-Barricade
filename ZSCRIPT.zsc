@@ -67,7 +67,7 @@ class HDDeployableBarricade : HDPickup
 		Inventory.PickupMessage "Picked up a deployable barricade.";
 		Tag "Deployable barricade";
 		XScale 1.4;
-		YScale 1.2;
+		YScale 1.16;
 	}
 
 	States
