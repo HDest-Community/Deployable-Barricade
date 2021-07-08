@@ -28,7 +28,7 @@ class HDDeployableBarricade : HDPickup
 		string extra = "";
 		if (Health < 500)
 		{
-			extra = " It's barely functional.";
+			extra = " It's barely standing up.";
 		}
 		else if (Health < 1000)
 		{
@@ -36,7 +36,7 @@ class HDDeployableBarricade : HDPickup
 		}
 		else if (Health < 2000)
 		{
-			extra = " 'Tis but a scratch.";
+			extra = " There are a few holes in it, but it works.";
 		}
 		else if (Health < 3000)
 		{
