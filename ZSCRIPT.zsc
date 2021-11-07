@@ -23,39 +23,36 @@ class BarricadeHandler : EventHandler
 
 class HDDeployableBarricade : HDPickup
 {
-	override string PickupMessage()
+	override int DisplayAmount()
 	{
-		string extra = "";
-		if (Health < 500)
+		let HDHud = HDStatusBar(StatusBar);
+		double perc = Health / double(default.Health);
+		if (perc > 0.75)
 		{
-			extra = " It's barely standing up.";
+			HDHud.SavedColour = Font.CR_GREEN;
 		}
-		else if (Health < 1000)
+		else if (perc > 0.50)
 		{
-			extra = " It's been seriously roughed up.";
+			HDHud.SavedColour = Font.CR_YELLOW;
 		}
-		else if (Health < 2000)
+		else if (perc > 0.25)
 		{
-			extra = " There are a few holes in it, but it works.";
+			HDHud.SavedColour = Font.CR_ORANGE;
 		}
-		else if (Health < 3000)
+		else if (perc > 0.08)
 		{
-			extra = " It can still stop a lot of bullets.";
+			HDHud.SavedColour = Font.CR_RED;
 		}
-		else if (Health < 4000)
+		else
 		{
-			extra = " It has a few dents on it.";
+			HDHud.SavedColour = Font.CR_BLACK;
 		}
-		else if (Health < 4500)
-		{
-			extra = " It's almost brand new.";
-		}
-		return Super.PickupMessage()..extra;
+		return Health;
 	}
 
 	Default
 	{
-		Health 5000;
+		Health 7000;
 		+HDPICKUP.CHEATNOGIVE
 		+HDPICKUP.NOTINPOCKETS
 		+INVENTORY.INVBAR
@@ -91,6 +88,7 @@ class HDDeployableBarricade : HDPickup
 				depBarricade.Health = invoker.Health;
 				depBarricade.angle += 180;
 				depBarricade.vel += vel;
+				depBarricade.A_GiveInventory('ImmunityToFire');
 			}
 			Stop;
 	}
@@ -100,15 +98,41 @@ class HDDeployedBarricade : HDActor
 {
 	override void Tick()
 	{
+		if (IsFrozen())
+		{
+			return;
+		}
+
 		Super.Tick();
 		if (GetAge() % 10 == 0 && TimesUsed > 0)
 		{
 			TimesUsed--;
 		}
-		// if (!IsFrozen())
-		// {
-		// 	AceCore.DrawCollisionBox(self, 0xFF0000, 1, 1);
-		// }
+
+		if (Deployed)
+		{
+			double perc = Health / double(GetDefaultByType('HDDeployableBarricade').Health);
+			Color col = 0xFFFF1111;
+			if (perc > 0.75)
+			{
+				col = 0xFF22FF22;
+			}
+			else if (perc > 0.50)
+			{
+				col = 0xFFFFFF22;
+			}
+			else if (perc > 0.25)
+			{
+				col = 0xFFFFAA22;
+			}
+			for (double i = 0; i <= 64 * perc; i += 0.5)
+			{
+				double lengthFac = 1.0 - min(1.0, (i ** 1.05) / (64 * perc));
+				A_SpawnParticle(col, SPF_FULLBRIGHT | SPF_RELATIVE, 1, 5 * lengthFac + 10 * min(1.0, perc * 1.5) * sin((i / (32.0 * perc)) * 85), 0, 8 + i, 0, 34, startalphaf: 0.30 * min(1.0, perc * 2) * lengthFac);
+			}
+		}
+
+		// AceCore.DrawCollisionBox(self, 0xFF0000, 1, 1);
 	}
 
 	override bool Used(Actor user)
@@ -165,12 +189,12 @@ class HDDeployedBarricade : HDActor
 		Mass 20000;
 		Friction 0.95;
 		Renderstyle "Normal";
-		DamageFactor "Hot", 0.15;
+		DamageFactor "Hot", 0.10;
 		DamageFactor "Balefire", 0.05;
-		DamageFactor "Burning", 0.15;
+		DamageFactor "Burning", 0.10;
 		DamageFactor "Electrical", 0.05;
 		DamageFactor "Holy", 0;
-		Gravity 1.5;
+		Gravity 1.4;
 		Friction 0.5;
 		+SOLID
 	}
