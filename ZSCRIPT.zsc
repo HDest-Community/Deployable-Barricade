@@ -111,25 +111,35 @@ class HDDeployedBarricade : HDActor
 
 		if (Deployed)
 		{
-			double perc = Health / double(GetDefaultByType('HDDeployableBarricade').Health);
-			Color col = 0xFFFF1111;
-			if (perc > 0.75)
+			double healthFac = Health / double(GetDefaultByType('HDDeployableBarricade').Health);
+			if (StretchFac < healthFac)
 			{
-				col = 0xFF22FF22;
+				StretchFac = min(healthFac, StretchFac + 0.1);
 			}
-			else if (perc > 0.50)
-			{
-				col = 0xFFFFFF22;
-			}
-			else if (perc > 0.25)
-			{
-				col = 0xFFFFAA22;
-			}
-			for (double i = 0; i <= 64 * perc; i += 0.5)
-			{
-				double lengthFac = 1.0 - min(1.0, (i ** 1.05) / (64 * perc));
-				A_SpawnParticle(col, SPF_FULLBRIGHT | SPF_RELATIVE, 1, 5 * lengthFac + 10 * min(1.0, perc * 1.5) * sin((i / (32.0 * perc)) * 85), 0, 8 + i, 0, 34, startalphaf: 0.30 * min(1.0, perc * 2) * lengthFac);
-			}
+		}
+		else if (InStateSequence(CurState, FindState('UnDeploy')) && StretchFac > 0)
+		{
+			StretchFac = max(0, StretchFac - 0.1);
+		}
+
+		Color beamCol = 0xFFFF1111;
+		if (StretchFac > 0.75)
+		{
+			beamCol = 0xFF22FF22;
+		}
+		else if (StretchFac > 0.50)
+		{
+			beamCol = 0xFFFFFF22;
+		}
+		else if (StretchFac > 0.25)
+		{
+			beamCol = 0xFFFFAA22;
+		}
+
+		for (double i = 0; i < 64 * StretchFac; i += 0.5)
+		{
+			double lengthFac = 1.0 - min(1.0, (i ** 1.05) / (64 * StretchFac));
+			A_SpawnParticle(beamCol, SPF_FULLBRIGHT | SPF_RELATIVE, 1, 5 * lengthFac + 10 * min(1.0, StretchFac * 1.5) * sin((i / (32.0 * StretchFac)) * 85), 0, 8 + i, 0, 34, startalphaf: 0.30 * min(1.0, StretchFac * 2) * lengthFac);
 		}
 
 		// AceCore.DrawCollisionBox(self, 0xFF0000, 1, 1);
@@ -181,6 +191,7 @@ class HDDeployedBarricade : HDActor
 	Array<BarricadeBarricade> LeftSideSegments;
 	Array<BarricadeBarricade> RightSideSegments;
 	private int Offset;
+	private double StretchFac;
 
 	Default
 	{
