@@ -205,6 +205,7 @@ class HDDeployedBarricade : HDActor
 		DamageFactor "Burning", 0.10;
 		DamageFactor "Electrical", 0.05;
 		DamageFactor "Holy", 0;
+		DamageFactor "Bashing", 0.10;
 		Gravity 1.4;
 		Friction 0.5;
 		+SOLID
