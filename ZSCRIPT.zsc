@@ -52,7 +52,7 @@ class HDDeployableBarricade : HDPickup
 
 	Default
 	{
-		Health 7000;
+		Health 5000;
 		+HDPICKUP.CHEATNOGIVE
 		+HDPICKUP.NOTINPOCKETS
 		+INVENTORY.INVBAR
@@ -204,7 +204,7 @@ class HDDeployedBarricade : HDActor
 		DamageFactor "Burning", 0.10;
 		DamageFactor "Electrical", 0.05;
 		DamageFactor "Holy", 0;
-		DamageFactor "Bashing", 0.10;
+		DamageFactor "Bashing", 0.25;
 		Gravity 1.4;
 		Friction 0.5;
 		+SOLID
