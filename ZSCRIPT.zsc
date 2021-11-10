@@ -147,7 +147,7 @@ class HDDeployedBarricade : HDActor
 		{
 			return false;
 		}
-		else if (TimesUsed < 4)
+		else if (TimesUsed < 3)
 		{
 			TimesUsed++;
 			return false;
