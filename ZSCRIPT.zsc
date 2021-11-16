@@ -205,6 +205,7 @@ class HDDeployedBarricade : HDActor
 		Gravity 1.4;
 		Friction 0.5;
 		+SOLID
+		+FRIENDLY
 	}
 
 	States
@@ -440,6 +441,7 @@ class BarricadeBarricade : HDActor
 		+WALLSPRITE
 		+NOFRICTIONBOUNCE
 		+NOLIFTDROP
+		+FRIENDLY
 	}
 
 	States
